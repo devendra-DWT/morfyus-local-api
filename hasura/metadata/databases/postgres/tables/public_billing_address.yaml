@@ -1,0 +1,72 @@
+table:
+  name: billing_address
+  schema: public
+configuration:
+  column_config:
+    address_line_first:
+      custom_name: addressLineFirst
+    address_line_second:
+      custom_name: addressLineSecond
+    created_at:
+      custom_name: createdAt
+    state_or_province:
+      custom_name: stateOrProvince
+    updated_at:
+      custom_name: updatedAt
+    user_id:
+      custom_name: userId
+    zip_or_postal_code:
+      custom_name: zipOrPostalCode
+  custom_column_names:
+    address_line_first: addressLineFirst
+    address_line_second: addressLineSecond
+    created_at: createdAt
+    state_or_province: stateOrProvince
+    updated_at: updatedAt
+    user_id: userId
+    zip_or_postal_code: zipOrPostalCode
+  custom_root_fields: {}
+insert_permissions:
+  - role: customer
+    permission:
+      check: {}
+      set:
+        user_id: x-hasura-User-Id
+      columns:
+        - address_line_first
+        - address_line_second
+        - city
+        - country
+        - state_or_province
+        - zip_or_postal_code
+select_permissions:
+  - role: customer
+    permission:
+      columns:
+        - id
+        - user_id
+        - country
+        - address_line_first
+        - address_line_second
+        - city
+        - state_or_province
+        - zip_or_postal_code
+        - created_at
+        - updated_at
+      filter:
+        user_id:
+          _eq: X-Hasura-User-Id
+update_permissions:
+  - role: customer
+    permission:
+      columns:
+        - address_line_first
+        - address_line_second
+        - city
+        - country
+        - state_or_province
+        - zip_or_postal_code
+      filter: {}
+      check:
+        user_id:
+          _eq: X-Hasura-User-Id

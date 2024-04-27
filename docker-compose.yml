@@ -1,0 +1,200 @@
+services:
+  reproxy:
+    image: umputun/reproxy:master
+    container_name: reproxy
+    hostname: reproxy
+    command: /srv/reproxy --assets.spa
+    restart: unless-stopped
+    ports:
+      - "80:8080"
+      - "443:8443"
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /var/ssl:/srv/var/ssl
+    environment:
+      DOCKER_ENABLED: 'true'
+      DOCKER_AUTO: 'true'
+      DEBUG: 'true'
+      MAX_SIZE: '0'
+      SSL_TYPE: 'auto'
+      SSL_ACME_FQDN: ${SSL_ACME_FQDN}
+      SSL_ACME_LOCATION: '/srv/var/ssl'
+      TIMEOUT_READ_HEADER: '30s'
+      TIMEOUT_RESP_HEADER: '30s'
+      GZIP: 'true'
+
+  graphql-engine:
+    image: hasura/graphql-engine:v2.23.0
+    hostname: engine
+    container_name: engine
+    expose:
+      - 8080
+    restart: unless-stopped
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: ${HASURA_DATABASE_URL}
+      HASURA_GRAPHQL_METADATA_DATABASE_URL: ${HASURA_METADATA_DATABASE_URL}
+      HASURA_GRAPHQL_ENABLE_CONSOLE: "true"
+      HASURA_GRAPHQL_DEV_MODE: ${HASURA_GRAPHQL_DEV_MODE}
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
+      HASURA_REMOTE_SCHEMA_URL: ${HASURA_REMOTE_SCHEMA_URL}
+      HASURA_IPFS_NODE_REMOTE_SCHEMA_URL: ${HASURA_IPFS_NODE_REMOTE_SCHEMA_URL}
+      HASURA_GRAPHQL_JWT_SECRETS: '[{"type":"HS256", "key": "${JWT_ACCESS_SECRET}", "issuer": "access"}, {"type":"HS256", "key": "${JWT_REFRESH_SECRET}", "issuer": "refresh"}]'
+      HASURA_GRAPHQL_ENABLE_REMOTE_SCHEMA_PERMISSIONS: "true"
+      HASURA_GRAPHQL_UNAUTHORIZED_ROLE: "anonymous"
+    depends_on:
+      - api-database
+      - api
+    labels:
+      - "reproxy.server=*"
+
+  api:
+    build: .
+    restart: unless-stopped
+    container_name: api
+    expose:
+      - 3000
+    environment:
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN}
+      SALT_ROUNDS: ${SALT_ROUNDS}
+      DATABASE_URL: ${HASURA_DATABASE_URL}
+      DIGITALOCEAN_ENDPOINT: ${DIGITALOCEAN_ENDPOINT}
+      DIGITALOCEAN_REGION: ${DIGITALOCEAN_REGION}
+      DIGITALOCEAN_ACCESS_KEY_ID: ${DIGITALOCEAN_ACCESS_KEY_ID}
+      DIGITALOCEAN_SECRET_ACCESS_KEY: ${DIGITALOCEAN_SECRET_ACCESS_KEY}
+      DIGITALOCEAN_BUCKET: ${DIGITALOCEAN_BUCKET}
+      API_URL: ${API_URL}
+      FRONTEND_URL: ${FRONTEND_URL}
+      POSTMARK_SERVER_TOKEN: ${POSTMARK_SERVER_TOKEN}
+      POSTMARK_SENDER_EMAIL: ${POSTMARK_SENDER_EMAIL}
+      POSTMARK_SENDER_MESSAGE_STREAM: ${POSTMARK_SENDER_MESSAGE_STREAM}
+      MAILER_LITE_API_KEY: ${MAILER_LITE_API_KEY}
+      MAILER_LITE_GROUP_ID: ${MAILER_LITE_GROUP_ID}
+    depends_on:
+      - api-database
+    labels:
+      - "reproxy.server=*"
+
+  ipfs-api:
+    container_name: ipfs-api
+    build:
+      context: ../morfyus-ipfs-api
+      dockerfile: Dockerfile
+    expose:
+      - 4000
+    environment:
+      IPFS_URL: ${IPFS_URL}
+    depends_on:
+      - ipfs-node
+    labels:
+      - "reproxy.enabled=no"
+
+  client:
+    container_name: client
+    restart: unless-stopped
+    build:
+      context: ../morfyus-frontend
+      dockerfile: Dockerfile
+      args:
+        IMAGE_LOCATION_URL: ${IMAGE_LOCATION_URL}
+        SERVER_SIDE_API_URL: ${SERVER_SIDE_API_URL}
+        NEXT_PUBLIC_FRONTEND_URL: ${FRONTEND_URL}
+        NEXT_PUBLIC_CLIENT_SIDE_API_URL: ${NEXT_PUBLIC_CLIENT_SIDE_API_URL}
+        NEXT_PUBLIC_GRAPHQL_ENDPOINT: ${NEXT_PUBLIC_GRAPHQL_ENDPOINT}
+        NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
+        NEXT_PUBLIC_API_KEY_GOOGLE_MAP: ${NEXT_PUBLIC_API_KEY_GOOGLE_MAP}
+        NEXT_PUBLIC_PIRSCH_IDENTIFICATION_CODE: ${NEXT_PUBLIC_PIRSCH_IDENTIFICATION_CODE}
+    environment:
+      SERVER_SIDE_API_URL: ${SERVER_SIDE_API_URL}
+      IMAGE_LOCATION_URL: ${IMAGE_LOCATION_URL}
+    expose:
+      - 3000
+    labels:
+      - "reproxy.server=*"
+      - "reproxy.route=^/(.*)$$"
+      - "reproxy.target=http://client:3000/$$1"
+    depends_on:
+      - strapi
+      - api
+
+  strapi:
+    container_name: strapi
+    restart: unless-stopped
+    build:
+      context: ../morfyus-backend
+      dockerfile: Dockerfile
+    expose:
+      - 1337
+    environment:
+      DATABASE_CLIENT: "postgres"
+      DATABASE_HOST: "strapi-database"
+      DATABASE_PORT: ${STRAPI_DATABASE_PORT}
+      DATABASE_NAME: ${STRAPI_DATABASE_NAME}
+      DATABASE_USERNAME: ${STRAPI_DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${STRAPI_DATABASE_PASSWORD}
+    volumes:
+      - uploads:/usr/src/app/public/uploads
+    depends_on:
+      - strapi-database
+    labels:
+      - "reproxy.server=strapi"
+      - "reproxy.route=^/(.*)$$"
+      - "reproxy.target=http://strapi:1337/$$1"
+
+  ipfs-node:
+    container_name: ipfs-node
+    image: ipfs/kubo:latest
+    restart: unless-stopped
+    volumes:
+      - ipfs_export:/export
+      - ipfs_data:/data/ipfs
+      - ./container-init.d:/container-init.d
+    ports:
+      - 4001:4001
+      - 5001:5001
+      - 8080:8080
+    environment:
+      IPFS_PROFILE: server
+    labels:
+      - "reproxy.enabled=no"
+
+  strapi-database:
+    image: postgres:alpine
+    restart: unless-stopped
+    container_name: strapi-database
+    expose:
+      - 5432
+    environment:
+      POSTGRES_DB: ${STRAPI_DATABASE_NAME}
+      POSTGRES_USER: ${STRAPI_DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${STRAPI_DATABASE_PASSWORD}
+    volumes:
+      - strapi_db_data:/var/lib/postgresql/data
+    labels:
+      - "reproxy.enabled=no"
+
+  api-database:
+    image: postgres:alpine
+    restart: unless-stopped
+    container_name: api-database
+    expose:
+      - 5432
+    environment:
+      POSTGRES_DB: ${API_DATABASE_NAME}
+      POSTGRES_USER: ${API_DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${API_DATABASE_PASSWORD}
+    volumes:
+      - api_db_data:/var/lib/postgresql/data
+    labels:
+      - "reproxy.enabled=no"
+
+
+volumes:
+  strapi_db_data:
+  api_db_data:
+  uploads:
+  ipfs_export:
+  ipfs_data:

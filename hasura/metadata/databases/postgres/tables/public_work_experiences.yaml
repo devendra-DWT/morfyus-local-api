@@ -1,0 +1,22 @@
+table:
+  name: work_experiences
+  schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - name
+      filter: {}
+  - role: customer
+    permission:
+      columns:
+        - id
+        - name
+      filter: {}
+  - role: freelancer
+    permission:
+      columns:
+        - id
+        - name
+      filter: {}

@@ -1,0 +1,138 @@
+services:
+  graphql-engine:
+    image: hasura/graphql-engine:v2.23.0
+    hostname: engine
+    container_name: engine
+    ports:
+      - '8080:8080'
+    restart: unless-stopped
+    environment:
+      HASURA_GRAPHQL_DATABASE_URL: ${HASURA_DATABASE_URL}
+      HASURA_GRAPHQL_METADATA_DATABASE_URL: ${HASURA_METADATA_DATABASE_URL}
+      HASURA_GRAPHQL_ENABLE_CONSOLE: 'true'
+      HASURA_GRAPHQL_DEV_MODE: ${HASURA_GRAPHQL_DEV_MODE}
+      HASURA_GRAPHQL_ENABLED_LOG_TYPES: startup, http-log, webhook-log, websocket-log, query-log
+      HASURA_GRAPHQL_ADMIN_SECRET: ${HASURA_GRAPHQL_ADMIN_SECRET}
+      HASURA_REMOTE_SCHEMA_URL: ${HASURA_REMOTE_SCHEMA_URL}
+      HASURA_IPFS_NODE_REMOTE_SCHEMA_URL: ${HASURA_IPFS_NODE_REMOTE_SCHEMA_URL}
+      HASURA_GRAPHQL_JWT_SECRETS: '[{"type":"HS256", "key": "${JWT_ACCESS_SECRET}", "issuer": "access"}, {"type":"HS256", "key": "${JWT_REFRESH_SECRET}", "issuer": "refresh"}]'
+      HASURA_GRAPHQL_ENABLE_REMOTE_SCHEMA_PERMISSIONS: 'true'
+      HASURA_GRAPHQL_UNAUTHORIZED_ROLE: 'anonymous'
+      HASURA_GRAPHQL_CORS_DOMAIN: 'http://localhost:3001,http://localhost:9695'
+    depends_on:
+      - api-database
+
+  api:
+    build: .
+    restart: unless-stopped
+    container_name: api 
+    ports:
+      - '3000:3000'
+    environment:
+      JWT_ACCESS_SECRET: ${JWT_ACCESS_SECRET}
+      JWT_ACCESS_EXPIRES_IN: ${JWT_ACCESS_EXPIRES_IN}
+      JWT_REFRESH_SECRET: ${JWT_REFRESH_SECRET}
+      JWT_REFRESH_EXPIRES_IN: ${JWT_REFRESH_EXPIRES_IN}
+      SALT_ROUNDS: ${SALT_ROUNDS}
+      DATABASE_URL: ${HASURA_DATABASE_URL}
+      DIGITALOCEAN_ENDPOINT: ${DIGITALOCEAN_ENDPOINT}
+      DIGITALOCEAN_REGION: ${DIGITALOCEAN_REGION}
+      DIGITALOCEAN_ACCESS_KEY_ID: ${DIGITALOCEAN_ACCESS_KEY_ID}
+      DIGITALOCEAN_SECRET_ACCESS_KEY: ${DIGITALOCEAN_SECRET_ACCESS_KEY}
+      DIGITALOCEAN_BUCKET: ${DIGITALOCEAN_BUCKET}
+      API_URL: ${API_URL}
+      FRONTEND_URL: ${FRONTEND_URL}
+      POSTMARK_SERVER_TOKEN: ${POSTMARK_SERVER_TOKEN}
+      POSTMARK_SENDER_EMAIL: ${POSTMARK_SENDER_EMAIL}
+      POSTMARK_SENDER_MESSAGE_STREAM: ${POSTMARK_SENDER_MESSAGE_STREAM}
+      MAILER_LITE_API_KEY: ${MAILER_LITE_API_KEY}
+      MAILER_LITE_GROUP_ID: ${MAILER_LITE_GROUP_ID}
+    depends_on:
+      - api-database
+
+  ipfs-api:
+    container_name: ipfs-api
+    build:
+      context: ../morfyus-ipfs-api
+      dockerfile: Dockerfile
+    expose:
+      - 4000
+    ports:
+      - '4000:4000'
+    environment:
+      IPFS_URL: ${IPFS_URL}
+
+  client:
+    container_name: client
+    restart: unless-stopped
+    build:
+      context: ../morfyus-frontend
+      dockerfile: Dockerfile
+      args:
+        SERVER_SIDE_API_URL: ${SERVER_SIDE_API_URL}
+        NEXT_PUBLIC_CLIENT_SIDE_API_URL: ${NEXT_PUBLIC_CLIENT_SIDE_API_URL}
+        NEXT_PUBLIC_GRAPHQL_ENDPOINT: ${NEXT_PUBLIC_GRAPHQL_ENDPOINT}
+        NEXT_PUBLIC_BACKEND_URL: ${NEXT_PUBLIC_BACKEND_URL}
+        NEXT_PUBLIC_API_KEY_GOOGLE_MAP: ${NEXT_PUBLIC_API_KEY_GOOGLE_MAP}
+    environment:
+      SERVER_SIDE_API_URL: ${SERVER_SIDE_API_URL}
+    expose:
+      - 3000
+    depends_on:
+      - strapi
+      - api
+
+  strapi:
+    container_name: strapi
+    restart: unless-stopped
+    build:
+      context: ../morfyus-backend
+      dockerfile: Dockerfile
+    ports:
+      - 1337:1337
+    environment:
+      DATABASE_CLIENT: 'postgres'
+      DATABASE_HOST: 'strapi-database'
+      DATABASE_PORT: ${STRAPI_DATABASE_PORT}
+      DATABASE_NAME: ${STRAPI_DATABASE_NAME}
+      DATABASE_USERNAME: ${STRAPI_DATABASE_USERNAME}
+      DATABASE_PASSWORD: ${STRAPI_DATABASE_PASSWORD}
+    volumes:
+      - uploads:/usr/src/app/public/uploads
+    depends_on:
+      - strapi-database
+
+  strapi-database:
+    image: postgres:alpine
+    restart: unless-stopped
+    container_name: strapi-database
+    expose:
+      - 5432
+    environment:
+      POSTGRES_DB: ${STRAPI_DATABASE_NAME}
+      POSTGRES_USER: ${STRAPI_DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${STRAPI_DATABASE_PASSWORD}
+    volumes:
+      - strapi_db_data:/var/lib/postgresql/data
+
+  api-database:
+    image: postgres:alpine
+    restart: unless-stopped
+    container_name: api-database
+    ports:
+      - 5432:5432
+    expose:
+      - 5432
+    environment:
+      POSTGRES_DB: ${API_DATABASE_NAME}
+      POSTGRES_USER: ${API_DATABASE_USERNAME}
+      POSTGRES_PASSWORD: ${API_DATABASE_PASSWORD}
+    volumes:
+      - api_db_data:/var/lib/postgresql/data
+
+volumes:
+  strapi_db_data:
+  api_db_data:
+  uploads:
+  ipfs_export:
+  ipfs_data:

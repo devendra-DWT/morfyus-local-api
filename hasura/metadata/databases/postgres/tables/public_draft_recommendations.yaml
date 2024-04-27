@@ -1,0 +1,258 @@
+table:
+  name: draft_recommendations
+  schema: public
+configuration:
+  column_config:
+    contract_type_id:
+      custom_name: contractTypeId
+    created_at:
+      custom_name: createdAt
+    duration_in_months:
+      custom_name: durationInMonths
+    full_name:
+      custom_name: fullName
+    image_urls:
+      custom_name: imageUrls
+    project_details:
+      custom_name: projectDetails
+    recipient_email:
+      custom_name: recipientEmail
+    relationship_id:
+      custom_name: relationshipId
+    sender_email:
+      custom_name: senderEmail
+    sender_feedback:
+      custom_name: senderFeedback
+    skills_ids:
+      custom_name: skillsIds
+    total_amount:
+      custom_name: totalAmount
+    updated_at:
+      custom_name: updatedAt
+  custom_column_names:
+    contract_type_id: contractTypeId
+    created_at: createdAt
+    duration_in_months: durationInMonths
+    full_name: fullName
+    image_urls: imageUrls
+    project_details: projectDetails
+    recipient_email: recipientEmail
+    relationship_id: relationshipId
+    sender_email: senderEmail
+    sender_feedback: senderFeedback
+    skills_ids: skillsIds
+    total_amount: totalAmount
+    updated_at: updatedAt
+  custom_root_fields: {}
+object_relationships:
+  - name: recipient
+    using:
+      foreign_key_constraint_on: recipient_email
+  - name: relationship
+    using:
+      manual_configuration:
+        column_mapping:
+          relationship_id: id
+        insertion_order: null
+        remote_table:
+          name: relationship_options
+          schema: public
+  - name: sender
+    using:
+      manual_configuration:
+        column_mapping:
+          sender_email: email
+        insertion_order: null
+        remote_table:
+          name: users
+          schema: public
+insert_permissions:
+  - role: customer
+    permission:
+      check:
+        _or:
+          - recipient:
+              id:
+                _eq: X-Hasura-User-Id
+          - sender:
+              id:
+                _eq: X-Hasura-User-Id
+      columns:
+        - contract_type_id
+        - duration_in_months
+        - experience
+        - full_name
+        - hourly
+        - image_urls
+        - project_details
+        - recipient_email
+        - relationship_id
+        - sender_email
+        - sender_feedback
+        - skills_ids
+        - status
+        - total_amount
+  - role: freelancer
+    permission:
+      check:
+        _or:
+          - recipient:
+              id:
+                _eq: X-Hasura-User-Id
+          - sender:
+              id:
+                _eq: X-Hasura-User-Id
+      columns:
+        - contract_type_id
+        - duration_in_months
+        - experience
+        - full_name
+        - hourly
+        - image_urls
+        - project_details
+        - recipient_email
+        - relationship_id
+        - sender_email
+        - sender_feedback
+        - skills_ids
+        - status
+        - total_amount
+select_permissions:
+  - role: customer
+    permission:
+      columns:
+        - contract_type_id
+        - created_at
+        - duration_in_months
+        - experience
+        - full_name
+        - hourly
+        - id
+        - image_urls
+        - project_details
+        - recipient_email
+        - relationship_id
+        - sender_email
+        - sender_feedback
+        - skills_ids
+        - status
+        - total_amount
+        - updated_at
+      filter:
+        _or:
+          - recipient:
+              id:
+                _eq: X-Hasura-User-Id
+          - sender:
+              id:
+                _eq: X-Hasura-User-Id
+  - role: freelancer
+    permission:
+      columns:
+        - contract_type_id
+        - created_at
+        - duration_in_months
+        - experience
+        - full_name
+        - hourly
+        - id
+        - image_urls
+        - project_details
+        - recipient_email
+        - relationship_id
+        - sender_email
+        - sender_feedback
+        - skills_ids
+        - status
+        - total_amount
+        - updated_at
+      filter:
+        _or:
+          - recipient:
+              id:
+                _eq: X-Hasura-User-Id
+          - sender:
+              id:
+                _eq: X-Hasura-User-Id
+update_permissions:
+  - role: customer
+    permission:
+      columns:
+        - contract_type_id
+        - duration_in_months
+        - experience
+        - hourly
+        - image_urls
+        - project_details
+        - relationship_id
+        - sender_feedback
+        - skills_ids
+        - status
+        - total_amount
+      filter:
+        _or:
+          - recipient:
+              id:
+                _eq: X-Hasura-User-Id
+          - sender:
+              id:
+                _eq: X-Hasura-User-Id
+      check:
+        _or:
+          - recipient:
+              id:
+                _eq: X-Hasura-User-Id
+          - sender:
+              id:
+                _eq: X-Hasura-User-Id
+  - role: freelancer
+    permission:
+      columns:
+        - contract_type_id
+        - duration_in_months
+        - experience
+        - hourly
+        - image_urls
+        - project_details
+        - relationship_id
+        - sender_feedback
+        - skills_ids
+        - status
+        - total_amount
+      filter:
+        _or:
+          - recipient:
+              id:
+                _eq: X-Hasura-User-Id
+          - sender:
+              id:
+                _eq: X-Hasura-User-Id
+      check:
+        _or:
+          - recipient:
+              id:
+                _eq: X-Hasura-User-Id
+          - sender:
+              id:
+                _eq: X-Hasura-User-Id
+delete_permissions:
+  - role: customer
+    permission:
+      filter:
+        _or:
+          - recipient:
+              id:
+                _eq: X-Hasura-User-Id
+          - sender:
+              id:
+                _eq: X-Hasura-User-Id
+  - role: freelancer
+    permission:
+      filter:
+        _or:
+          - recipient:
+              id:
+                _eq: X-Hasura-User-Id
+          - sender:
+              id:
+                _eq: X-Hasura-User-Id

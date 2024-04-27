@@ -1,0 +1,3 @@
+table:
+  name: industries_job
+  schema: public

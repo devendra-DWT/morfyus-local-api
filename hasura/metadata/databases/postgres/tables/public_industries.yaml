@@ -1,0 +1,28 @@
+table:
+  name: industries
+  schema: public
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - name
+        - created_at
+        - updated_at
+      filter: {}
+  - role: customer
+    permission:
+      columns:
+        - id
+        - name
+        - created_at
+        - updated_at
+      filter: {}
+  - role: freelancer
+    permission:
+      columns:
+        - id
+        - name
+        - created_at
+        - updated_at
+      filter: {}

@@ -1,0 +1,94 @@
+table:
+  name: profile
+  schema: public
+configuration:
+  column_config:
+    company_name:
+      custom_name: companyName
+    created_at:
+      custom_name: createdAt
+    industry_id:
+      custom_name: industryId
+    updated_at:
+      custom_name: updatedAt
+    user_id:
+      custom_name: userId
+  custom_column_names:
+    company_name: companyName
+    created_at: createdAt
+    industry_id: industryId
+    updated_at: updatedAt
+    user_id: userId
+  custom_root_fields: {}
+object_relationships:
+  - name: industry
+    using:
+      foreign_key_constraint_on: industry_id
+insert_permissions:
+  - role: customer
+    permission:
+      check: {}
+      set:
+        user_id: x-hasura-User-Id
+      columns:
+        - company_name
+        - description
+        - industry_id
+        - location
+        - role
+        - url
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - company_name
+        - created_at
+        - description
+        - id
+        - industry_id
+        - location
+        - role
+        - updated_at
+        - url
+        - user_id
+      filter: {}
+  - role: customer
+    permission:
+      columns:
+        - company_name
+        - created_at
+        - description
+        - id
+        - industry_id
+        - location
+        - role
+        - updated_at
+        - url
+        - user_id
+      filter: {}
+  - role: freelancer
+    permission:
+      columns:
+        - company_name
+        - created_at
+        - description
+        - id
+        - industry_id
+        - location
+        - role
+        - updated_at
+        - url
+        - user_id
+      filter: {}
+update_permissions:
+  - role: customer
+    permission:
+      columns:
+        - company_name
+        - description
+        - industry_id
+        - location
+        - role
+        - url
+      filter: {}
+      check: null

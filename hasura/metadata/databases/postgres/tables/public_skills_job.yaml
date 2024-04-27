@@ -1,0 +1,63 @@
+table:
+  name: skills_job
+  schema: public
+configuration:
+  column_config:
+    job_id:
+      custom_name: jobId
+    skill_id:
+      custom_name: skillId
+  custom_column_names:
+    job_id: jobId
+    skill_id: skillId
+  custom_root_fields: {}
+object_relationships:
+  - name: job
+    using:
+      foreign_key_constraint_on: job_id
+  - name: skill
+    using:
+      foreign_key_constraint_on: skill_id
+insert_permissions:
+  - role: customer
+    permission:
+      check:
+        job:
+          user_id:
+            _eq: X-Hasura-User-Id
+      columns:
+        - job_id
+        - skill_id
+
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - id
+        - job_id
+        - skill_id
+        - created_at
+      filter: {}
+  - role: customer
+    permission:
+      columns:
+        - id
+        - job_id
+        - skill_id
+        - created_at
+      filter: {}
+  - role: freelancer
+    permission:
+      columns:
+        - id
+        - job_id
+        - skill_id
+        - created_at
+      filter: {}
+delete_permissions:
+  - role: customer
+    permission:
+        filter: {}
+       
+          
+        

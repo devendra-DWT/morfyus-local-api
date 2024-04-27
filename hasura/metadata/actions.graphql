@@ -1,0 +1,9 @@
+type fileOutput {
+  url: String!
+}
+
+type FileUploadResponse {
+  url: String!
+}
+
+scalar Upload

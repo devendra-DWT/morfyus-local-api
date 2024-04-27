@@ -1,0 +1,199 @@
+table:
+  name: job
+  schema: public
+configuration:
+  column_config:
+    created_at:
+      custom_name: createdAt
+    fix_price:
+      custom_name: fixPrice
+    payment_option:
+      custom_name: paymentOption
+    price_max:
+      custom_name: priceMax
+    price_min:
+      custom_name: priceMin
+    publication_cost:
+      custom_name: publicationCost
+    updated_at:
+      custom_name: updatedAt
+    user_id:
+      custom_name: userId
+    is_active:
+      custom_name: isActive 
+    is_deleted:   
+      custom_name: isDeleted 
+    is_admin_deleted:   
+      custom_name: isAdminDeleted 
+    deleted_reason:   
+      custom_name: deletedReason 
+  custom_column_names:
+    created_at: createdAt
+    fix_price: fixPrice
+    payment_option: paymentOption
+    price_max: priceMax
+    price_min: priceMin
+    publication_cost: publicationCost
+    updated_at: updatedAt
+    user_id: userId
+    is_active: isActive
+    is_deleted: isDeleted
+    is_admin_deleted:  isAdminDeleted
+    deleted_reason: deletedReason
+  custom_root_fields: {}
+object_relationships:
+  - name: customer
+    using:
+      manual_configuration:
+        column_mapping:
+          user_id: id
+        insertion_order: null
+        remote_table:
+          name: users
+          schema: public
+array_relationships:
+  - name: offers
+    using:
+      foreign_key_constraint_on:
+        column: job_id
+        table:
+          name: offer
+          schema: public
+  - name: skillsJob
+    using:
+      foreign_key_constraint_on:
+        column: job_id
+        table:
+          name: skills_job
+          schema: public
+insert_permissions:
+  - role: customer
+    permission:
+      check: {}
+      set:
+        user_id: x-hasura-User-Id
+      columns:
+        - category
+        - description
+        - files
+        - fix_price
+        - headline
+        - payment_option
+        - price_max
+        - price_min
+        - publication_cost
+
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - category
+        - created_at
+        - description
+        - files
+        - fix_price
+        - headline
+        - id
+        - payment_option
+        - price_max
+        - price_min
+        - publication_cost
+        - updated_at
+        - user_id
+        - is_deleted
+        - is_active
+        - deleted_reason
+        - is_admin_deleted
+      filter:
+        deleted_at:
+          _is_null: true
+      allow_aggregations: true
+  - role: customer
+    permission:
+      columns:
+        - category
+        - created_at
+        - description
+        - files
+        - fix_price
+        - headline
+        - id
+        - payment_option
+        - price_max
+        - price_min
+        - publication_cost
+        - updated_at
+        - user_id
+        - is_active
+        - is_deleted
+        - deleted_reason
+        - is_admin_deleted
+      filter:
+        deleted_at:
+          _is_null: true
+      allow_aggregations: true
+  - role: freelancer
+    permission:
+      columns:
+        - category
+        - created_at
+        - description
+        - files
+        - fix_price
+        - headline
+        - id
+        - payment_option
+        - price_max
+        - price_min
+        - publication_cost
+        - updated_at
+        - user_id
+        - is_active
+        - is_deleted
+        - deleted_reason
+        - is_admin_deleted
+      filter:
+        deleted_at:
+          _is_null: true
+      allow_aggregations: true
+update_permissions:
+  - role: customer
+    permission:
+      columns:
+        - category
+        - created_at
+        - description
+        - files
+        - fix_price
+        - headline
+        - payment_option
+        - price_max
+        - price_min
+        - publication_cost
+        - updated_at
+        - user_id
+        - is_active
+        - is_deleted
+        - deleted_reason
+      filter: {}
+      check: {}
+  - role: freelancer
+    permission:
+      columns:
+        - category
+        - created_at
+        - description
+        - files
+        - fix_price
+        - headline
+        - payment_option
+        - price_max
+        - price_min
+        - publication_cost
+        - updated_at
+        - user_id
+        - is_active
+        - is_deleted
+        - deleted_reason
+      filter: {}
+      check: {}

@@ -1,0 +1,499 @@
+- name: ipfs-server
+  definition:
+    url: '{{HASURA_IPFS_NODE_REMOTE_SCHEMA_URL}}'
+    timeout_seconds: 60
+    customization: {}
+  comment: ''
+  permissions:
+    - role: anonymous
+      definition:
+        schema: |
+          schema {
+            query: Query
+          }
+          type IpfsTalentProfile {
+            path: String!
+            payload: TalentProfile!
+            previousVersionCid: String
+            publicUrl: String!
+          }
+          type Query {
+            talentProfile(path: String!): IpfsTalentProfile
+          }
+          type Recommendation {
+            contractTypeId: String
+            durationInMonths: Int
+            experience: String
+            fullName: String
+            hourly: Int
+            id: String
+            imageUrls: [UploadFile]!
+            kreds: Int!
+            projectDetails: String!
+            recipientEmail: String!
+            relationshipId: Int!
+            senderEmail: String!
+            senderFeedback: String!
+            skillsIds: [Int]!
+            totalAmount: Int
+          }
+          type TalentProfile {
+            avatarUrl: String
+            bio: String!
+            dribbleUrl: String
+            facebookUrl: String
+            firstName: String!
+            givenRecommendation: [Recommendation]
+            instagramUrl: String
+            kreds: Int!
+            lastName: String!
+            linkedinUrl: String
+            location: String!
+            receivedRecommendation: [Recommendation]
+            skills: [Int]
+            tiktokUrl: String
+            title: String!
+            twitterUrl: String
+            workExperience: [WorkExperience]
+          }
+          type UploadFile {
+            name: String!
+            size: Int!
+            type: String!
+            url: String!
+          }
+          type WorkExperience {
+            companyName: String!
+            description: String
+            endMonth: Int
+            endYear: Int
+            id: String
+            isCurrent: Boolean!
+            startMonth: Int!
+            startYear: Int!
+            title: String!
+          }
+    - role: freelancer
+      definition:
+        schema: |
+          schema {
+            query: Query
+            mutation: Mutation
+          }
+          type IpfsTalentProfile {
+            path: String!
+            payload: TalentProfile!
+            previousVersionCid: String
+            publicUrl: String!
+          }
+          type Mutation {
+            createTalentProfile(input: TalentProfileInput!, prevCid: String): IpfsTalentProfile
+            updateTalentProfile(path: String!, input: TalentProfileInput!): IpfsTalentProfile
+          }
+          type Query {
+            talentProfile(path: String!): IpfsTalentProfile
+          }
+          type Recommendation {
+            contractTypeId: String
+            durationInMonths: Int
+            experience: String
+            fullName: String
+            hourly: Int
+            id: String
+            imageUrls: [UploadFile]!
+            kreds: Int!
+            projectDetails: String!
+            recipientEmail: String!
+            relationshipId: Int!
+            senderEmail: String!
+            senderFeedback: String!
+            skillsIds: [Int]!
+            totalAmount: Int
+          }
+          type TalentProfile {
+            avatarUrl: String
+            bio: String!
+            dribbleUrl: String
+            facebookUrl: String
+            firstName: String!
+            givenRecommendation: [Recommendation]
+            instagramUrl: String
+            kreds: Int!
+            lastName: String!
+            linkedinUrl: String
+            location: String!
+            receivedRecommendation: [Recommendation]
+            skills: [Int]
+            tiktokUrl: String
+            title: String!
+            twitterUrl: String
+            workExperience: [WorkExperience]
+          }
+          type UploadFile {
+            name: String!
+            size: Int!
+            type: String!
+            url: String!
+          }
+          type WorkExperience {
+            companyName: String!
+            description: String
+            endMonth: Int
+            endYear: Int
+            id: String
+            isCurrent: Boolean!
+            startMonth: Int!
+            startYear: Int!
+            title: String!
+          }
+          input RecommendationInput {
+            contractTypeId: String
+            durationInMonths: Int
+            experience: String
+            fullName: String
+            hourly: Int
+            id: String
+            imageUrls: [UploadFileInput]!
+            kreds: Int!
+            projectDetails: String!
+            recipientEmail: String!
+            relationshipId: Int!
+            senderEmail: String!
+            senderFeedback: String!
+            skillsIds: [Int]!
+            totalAmount: Int
+          }
+          input TalentProfileInput {
+            avatarUrl: String
+            bio: String!
+            dribbleUrl: String
+            facebookUrl: String
+            firstName: String!
+            givenRecommendation: [RecommendationInput]
+            instagramUrl: String
+            kreds: Int!
+            lastName: String!
+            linkedinUrl: String
+            location: String!
+            receivedRecommendation: [RecommendationInput]
+            skills: [Int]
+            tiktokUrl: String
+            title: String!
+            twitterUrl: String
+            workExperience: [WorkExperienceInput]
+          }
+          input UploadFileInput {
+            name: String!
+            size: Int!
+            type: String!
+            url: String!
+          }
+          input WorkExperienceInput {
+            companyName: String!
+            description: String
+            endMonth: Int
+            endYear: Int
+            id: String
+            isCurrent: Boolean!
+            startMonth: Int!
+            startYear: Int!
+            title: String!
+          }
+    - role: customer
+      definition:
+        schema: |
+          schema {
+            query: Query
+            mutation: Mutation
+          }
+          type IpfsTalentProfile {
+            path: String!
+            payload: TalentProfile!
+            previousVersionCid: String
+            publicUrl: String!
+          }
+          type Mutation {
+            createTalentProfile(input: TalentProfileInput!, prevCid: String): IpfsTalentProfile
+            updateTalentProfile(path: String!, input: TalentProfileInput!): IpfsTalentProfile
+          }
+          type Query {
+            talentProfile(path: String!): IpfsTalentProfile
+          }
+          type Recommendation {
+            contractTypeId: String
+            durationInMonths: Int
+            experience: String
+            fullName: String
+            hourly: Int
+            id: String
+            imageUrls: [UploadFile]!
+            kreds: Int!
+            projectDetails: String!
+            recipientEmail: String!
+            relationshipId: Int!
+            senderEmail: String!
+            senderFeedback: String!
+            skillsIds: [Int]!
+            totalAmount: Int
+          }
+          type TalentProfile {
+            avatarUrl: String
+            bio: String!
+            dribbleUrl: String
+            facebookUrl: String
+            firstName: String!
+            givenRecommendation: [Recommendation]
+            instagramUrl: String
+            kreds: Int!
+            lastName: String!
+            linkedinUrl: String
+            location: String!
+            receivedRecommendation: [Recommendation]
+            skills: [Int]
+            tiktokUrl: String
+            title: String!
+            twitterUrl: String
+            workExperience: [WorkExperience]
+          }
+          type UploadFile {
+            name: String!
+            size: Int!
+            type: String!
+            url: String!
+          }
+          type WorkExperience {
+            companyName: String!
+            description: String
+            endMonth: Int
+            endYear: Int
+            id: String
+            isCurrent: Boolean!
+            startMonth: Int!
+            startYear: Int!
+            title: String!
+          }
+          input RecommendationInput {
+            contractTypeId: String
+            durationInMonths: Int
+            experience: String
+            fullName: String
+            hourly: Int
+            id: String
+            imageUrls: [UploadFileInput]!
+            kreds: Int!
+            projectDetails: String!
+            recipientEmail: String!
+            relationshipId: Int!
+            senderEmail: String!
+            senderFeedback: String!
+            skillsIds: [Int]!
+            totalAmount: Int
+          }
+          input TalentProfileInput {
+            avatarUrl: String
+            bio: String!
+            dribbleUrl: String
+            facebookUrl: String
+            firstName: String!
+            givenRecommendation: [RecommendationInput]
+            instagramUrl: String
+            kreds: Int!
+            lastName: String!
+            linkedinUrl: String
+            location: String!
+            receivedRecommendation: [RecommendationInput]
+            skills: [Int]
+            tiktokUrl: String
+            title: String!
+            twitterUrl: String
+            workExperience: [WorkExperienceInput]
+          }
+          input UploadFileInput {
+            name: String!
+            size: Int!
+            type: String!
+            url: String!
+          }
+          input WorkExperienceInput {
+            companyName: String!
+            description: String
+            endMonth: Int
+            endYear: Int
+            id: String
+            isCurrent: Boolean!
+            startMonth: Int!
+            startYear: Int!
+            title: String!
+          }
+- name: server
+  definition:
+    url: '{{HASURA_REMOTE_SCHEMA_URL}}'
+    timeout_seconds: 60
+    customization: {}
+    forward_client_headers: true
+  comment: ''
+  permissions:
+    - role: freelancer
+      definition:
+        schema: |
+          schema {
+            query: Query
+            mutation: Mutation
+          }
+          type Mutation {
+            confirmEmail(email: String!): Boolean!
+            mailerLiteSubscribers(createMailerLiteInput: SubscribersInput!): Boolean!
+            passwordReset(passwordResetInput: PasswordResetInput!): Boolean!
+            refreshToken: Tokens!
+            sendEmail(sendEmail: SendEmailInput!): Boolean!
+            signIn(signIn: SignInInput!): SignInEntity!
+            singUp(singUp: SignUpInput!): Tokens!
+            updateUserByJwtToken(user: UpdateUserByJwtTokenInput!): Boolean!
+          }
+          type Query {
+            test: String!
+          }
+          type SignInEntity {
+            accessToken: String!
+            cid: String
+            isCompleted: Boolean!
+            refreshToken: String!
+            role: String!
+          }
+          type Tokens {
+            accessToken: String!
+            refreshToken: String!
+          }
+          input PasswordResetInput {
+            newPassword: String!
+            resetPasswordToken: String!
+          }
+          input SendEmailInput {
+            htmlBody: String
+            subject: String!
+            textBody: String
+            to: String!
+            cc: String
+          }
+          input SignInInput {
+            email: String!
+            password: String!
+          }
+          input SignUpInput {
+            email: String!
+            password: String!
+            role: String!
+          }
+          input SubscribersInput {
+            email: String!
+            name: String!
+          }
+          input UpdateUserByJwtTokenInput {
+            isCompleted: Boolean
+            username: String
+          }
+    - role: customer
+      definition:
+        schema: |
+          schema {
+            query: Query
+            mutation: Mutation
+          }
+          type Mutation {
+            confirmEmail(email: String!): Boolean!
+            mailerLiteSubscribers(createMailerLiteInput: SubscribersInput!): Boolean!
+            passwordReset(passwordResetInput: PasswordResetInput!): Boolean!
+            refreshToken: Tokens!
+            sendEmail(sendEmail: SendEmailInput!): Boolean!
+            signIn(signIn: SignInInput!): SignInEntity!
+            singUp(singUp: SignUpInput!): Tokens!
+            updateUserByJwtToken(user: UpdateUserByJwtTokenInput!): Boolean!
+          }
+          type Query {
+            test: String!
+          }
+          type SignInEntity {
+            accessToken: String!
+            cid: String
+            isCompleted: Boolean!
+            refreshToken: String!
+            role: String!
+          }
+          type Tokens {
+            accessToken: String!
+            refreshToken: String!
+          }
+          input PasswordResetInput {
+            newPassword: String!
+            resetPasswordToken: String!
+          }
+          input SendEmailInput {
+            htmlBody: String
+            subject: String!
+            textBody: String
+            to: String!
+            cc: String
+          }
+          input SignInInput {
+            email: String!
+            password: String!
+          }
+          input SignUpInput {
+            email: String!
+            password: String!
+            role: String!
+          }
+          input SubscribersInput {
+            email: String!
+            name: String!
+          }
+          input UpdateUserByJwtTokenInput {
+            isCompleted: Boolean
+            username: String
+          }
+    - role: anonymous
+      definition:
+        schema: |
+          schema {
+            query: Query
+            mutation: Mutation
+          }
+          type Mutation {
+            confirmEmail(email: String!): Boolean!
+            mailerLiteSubscribers(createMailerLiteInput: SubscribersInput!): Boolean!
+            passwordReset(passwordResetInput: PasswordResetInput!): Boolean!
+            refreshToken: Tokens!
+            signIn(signIn: SignInInput!): SignInEntity!
+            singUp(singUp: SignUpInput!): Tokens!
+          }
+          type Query {
+            test: String!
+          }
+          type SignInEntity {
+            accessToken: String!
+            cid: String
+            isCompleted: Boolean!
+            refreshToken: String!
+            role: String!
+          }
+          type Tokens {
+            accessToken: String!
+            refreshToken: String!
+          }
+          input PasswordResetInput {
+            newPassword: String!
+            resetPasswordToken: String!
+          }
+          input SignInInput {
+            email: String!
+            password: String!
+          }
+          input SignUpInput {
+            email: String!
+            password: String!
+            role: String!
+          }
+          input SubscribersInput {
+            email: String!
+            name: String!
+          }

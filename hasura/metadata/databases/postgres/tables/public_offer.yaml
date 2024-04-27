@@ -1,0 +1,71 @@
+table:
+  name: offer
+  schema: public
+configuration:
+  column_config:
+    created_at:
+      custom_name: createdAt
+    job_id:
+      custom_name: jobID
+    updated_at:
+      custom_name: updatedAt
+    user_id:
+      custom_name: userID
+  custom_column_names:
+    created_at: createdAt
+    job_id: jobID
+    updated_at: updatedAt
+    user_id: userID
+  custom_root_fields: {}
+object_relationships:
+  - name: freelancer
+    using:
+      foreign_key_constraint_on: user_id
+  - name: job
+    using:
+      foreign_key_constraint_on: job_id
+insert_permissions:
+  - role: freelancer
+    permission:
+      check: {}
+      set:
+        user_id: x-hasura-User-Id
+      columns:
+        - files
+        - job_id
+        - letter
+        - rate
+select_permissions:
+  - role: anonymous
+    permission:
+      columns: []
+      filter: {}
+      allow_aggregations: true
+  - role: customer
+    permission:
+      columns:
+        - id
+        - job_id
+        - user_id
+        - files
+        - letter
+        - rate
+        - created_at
+        - updated_at
+      filter: {}
+      allow_aggregations: true
+  - role: freelancer
+    permission:
+      columns:
+        - id
+        - job_id
+        - user_id
+        - files
+        - letter
+        - rate
+        - created_at
+        - updated_at
+      filter:
+        user_id:
+          _eq: X-Hasura-User-Id
+      allow_aggregations: true

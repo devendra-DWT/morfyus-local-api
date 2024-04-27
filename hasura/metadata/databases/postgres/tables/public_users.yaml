@@ -1,0 +1,99 @@
+table:
+  name: users
+  schema: public
+configuration:
+  column_config:
+    confirm_email_token:
+      custom_name: confirmEmailToken
+    created_at:
+      custom_name: createdAt
+    is_completed:
+      custom_name: isCompleted
+    is_email_confirmed:
+      custom_name: isEmailConfirmed
+    refresh_token:
+      custom_name: refreshToken
+    reset_password_token:
+      custom_name: resetPasswordToken
+    updated_at:
+      custom_name: updatedAt
+  custom_column_names:
+    confirm_email_token: confirmEmailToken
+    created_at: createdAt
+    is_completed: isCompleted
+    is_email_confirmed: isEmailConfirmed
+    refresh_token: refreshToken
+    reset_password_token: resetPasswordToken
+    updated_at: updatedAt
+  custom_root_fields: {}
+array_relationships:
+  - name: profile
+    using:
+      foreign_key_constraint_on:
+        column: user_id
+        table:
+          name: profile
+          schema: public
+remote_relationships:
+  - definition:
+      to_remote_schema:
+        lhs_fields:
+          - cid
+        remote_field:
+          talentProfile:
+            arguments:
+              path: $cid
+        remote_schema: ipfs-server
+    name: talentProfile
+select_permissions:
+  - role: anonymous
+    permission:
+      columns:
+        - created_at
+        - email
+        - id
+        - is_completed
+        - role
+        - updated_at
+        - username
+      filter: {}
+  - role: customer
+    permission:
+      columns:
+        - cid
+        - created_at
+        - email
+        - id
+        - is_completed
+        - role
+        - updated_at
+        - username
+      filter: {}
+  - role: freelancer
+    permission:
+      columns:
+        - cid
+        - created_at
+        - email
+        - id
+        - is_completed
+        - role
+        - updated_at
+        - username
+      filter: {}
+update_permissions:
+  - role: customer
+    permission:
+      columns:
+        - cid
+        - is_completed
+      filter: {}
+      check:
+        is_completed:
+          _eq: true
+  - role: freelancer
+    permission:
+      columns:
+        - cid
+      filter: {}
+      check: {}

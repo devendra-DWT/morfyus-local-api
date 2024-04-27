@@ -1,0 +1,34 @@
+user: root
+ssh_key: ~/.ssh/id_morfyus_ed25519
+
+targets:
+  prod:
+    hosts:
+      - { host: "159.223.28.22", port: 22, user: "root" }
+
+tasks:
+  - name: deploy-docker
+    commands:
+      - name: pull strapi backend repo
+        script: cd ~/morfyus/morfyus-backend/ && git pull
+
+      - name: pull frontend repo
+        script: cd ~/morfyus/morfyus-frontend/ && git pull
+
+      - name: pull api repo
+        script: cd ~/morfyus/morfyus-api/ && git pull
+
+      - name: stop docker compose
+        script: cd ~/morfyus/morfyus-api/ && docker compose down
+
+      - name: start docker compose
+        script: cd ~/morfyus/morfyus-api/ && docker compose up -d --build
+
+      - name: wait
+        script: sleep 30s
+
+      - name: apply migrations
+        script: cd ~/morfyus/morfyus-api/ && hasura migrate apply --endpoint http://localhost:8080 --project ./hasura --envfile ../.env --all-databases
+
+      - name: apply metadata
+        script: cd ~/morfyus/morfyus-api/ && hasura metadata apply --endpoint http://localhost:8080 --project ./hasura --envfile ../.env
